@@ -6,16 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type Summary struct {
+type PaymentMethod struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Month    string  `gorm:"type:varchar(20);not null"` // Ex: "Dezembro"
-	TotalIn  float64 `gorm:"not null"`
-	TotalOut float64 `gorm:"not null"`
-	Balance  float64 `gorm:"not null"`
-
+	Name   string    `gorm:"type:varchar(100);not null"`
 	UserID uuid.UUID `gorm:"type:uuid;not null;index"`
 	User   *User     `gorm:"foreignKey:UserID"`
+
+	Categories   []Category    `gorm:"foreignKey:PaymentMethodID"`
+	Transactions []Transaction `gorm:"foreignKey:PaymentMethodID"`
 }

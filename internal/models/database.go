@@ -36,6 +36,7 @@ func migrate() {
 		&User{},
 		&Company{},
 		&Transaction{},
+		&Installment{},
 		&Category{},
 		&Summary{},
 	)

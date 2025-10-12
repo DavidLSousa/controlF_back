@@ -11,15 +11,18 @@ type User struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	// DeletedAt gorm.DeletedAt `gorm:"index"`
+
 	Name     string   `gorm:"type:varchar(255);not null"`
 	Email    string   `gorm:"type:varchar(255);not null;unique"`
 	Password string   `gorm:"type:varchar(255);not null"`
 	Type     UserType `gorm:"not null"`
 
 	/* Relacionamento com Empresa (opcional, apenas para usuários de empresa) */
-	CompanyID *uuid.UUID // Usamos ponteiro para permitir valor nulo (NULL)
-	Company   *Company   `gorm:"foreignKey:CompanyID"`
+	CompanyID    *uuid.UUID    // Usamos ponteiro para permitir valor nulo (NULL)
+	Company      *Company      `gorm:"foreignKey:CompanyID"`
+	Transactions []Transaction `gorm:"foreignKey:UserID"`
+	Categories   []Category    `gorm:"foreignKey:UserID"`
+	Summaries    []Summary     `gorm:"foreignKey:UserID"`
 }
 
 func (u *User) Save() error {
@@ -27,6 +30,7 @@ func (u *User) Save() error {
 	if err != nil {
 		return err
 	}
+	// Criar junto as categoras basicas - todas com status inactive (cafeteria, jantar, transporte, contas de casa, investimentos)
 	return nil
 }
 
@@ -35,12 +39,6 @@ func (u *User) Update(updates map[string]interface{}) error {
 		Model(&u).
 		Updates(updates).Error
 }
-
-// func (u *User) Delete() error {
-// 	return DB.
-// 		Delete(&u).
-// 		Error
-// }
 
 func GetUserWithRoles(id uuid.UUID) (*User, error) {
 	var err error
