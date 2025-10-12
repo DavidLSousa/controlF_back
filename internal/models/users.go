@@ -18,11 +18,12 @@ type User struct {
 	Type     UserType `gorm:"not null"`
 
 	/* Relacionamento com Empresa (opcional, apenas para usuários de empresa) */
-	CompanyID    *uuid.UUID    // Usamos ponteiro para permitir valor nulo (NULL)
-	Company      *Company      `gorm:"foreignKey:CompanyID"`
-	Transactions []Transaction `gorm:"foreignKey:UserID"`
-	Categories   []Category    `gorm:"foreignKey:UserID"`
-	Summaries    []Summary     `gorm:"foreignKey:UserID"`
+	CompanyID      *uuid.UUID      // Usamos ponteiro para permitir valor nulo (NULL)
+	Company        *Company        `gorm:"foreignKey:CompanyID"`
+	Transactions   []Transaction   `gorm:"foreignKey:UserID"`
+	Categories     []Category      `gorm:"foreignKey:UserID"`
+	Summaries      []Summary       `gorm:"foreignKey:UserID"`
+	PaymentMethods []PaymentMethod `gorm:"foreignKey:UserID"`
 }
 
 func (u *User) Save() error {

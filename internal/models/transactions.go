@@ -30,4 +30,6 @@ type Transaction struct {
 	Installment     *Installment   `gorm:"foreignKey:InstallmentID"`
 	PaymentMethodID uuid.UUID      `gorm:"type:uuid;not null"`
 	PaymentMethod   *PaymentMethod `gorm:"foreignKey:PaymentMethodID"`
+	CompanyID       *uuid.UUID     `gorm:"type:uuid"`
+	Company         *Company       `gorm:"foreignKey:CompanyID"`
 }

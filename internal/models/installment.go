@@ -1,12 +1,20 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Installment struct {
-	ID      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Current int       `gorm:"default:0"` // Parcela atual (ex: 1 de 12)
-	Total   int       `gorm:"default:0"` // Total de parcelas (ex: 12)
+	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	TransactionID uuid.UUID   `gorm:"type:uuid;not null"`
-	Transaction   Transaction `gorm:"foreignKey:TransactionID"`
+	Current       int          `gorm:"default:0"`
+	Total         int          `gorm:"default:0"`
+	TransactionID uuid.UUID    `gorm:"type:uuid;not null;uniqueIndex"`
+	Transaction   *Transaction `gorm:"foreignKey:TransactionID"`
 }
