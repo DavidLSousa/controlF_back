@@ -39,6 +39,7 @@ func migrate() {
 		&Installment{},
 		&Category{},
 		&Summary{},
+		&PaymentMethod{},
 	)
 }
 
