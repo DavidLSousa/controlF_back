@@ -22,12 +22,11 @@ type Transaction struct {
 	IsPaid      bool            `gorm:"default:false"` // Para marcar se já foi paga
 
 	// Relacionamentos
+	Installment     *Installment
 	CategoryID      uuid.UUID      `gorm:"type:uuid;not null"`
 	Category        *Category      `gorm:"foreignKey:CategoryID"`
 	UserID          uuid.UUID      `gorm:"type:uuid;not null;index"`
 	User            *User          `gorm:"foreignKey:UserID"`
-	InstallmentID   *uuid.UUID     // Pode ser nulo ✓
-	Installment     *Installment   `gorm:"foreignKey:InstallmentID"`
 	PaymentMethodID uuid.UUID      `gorm:"type:uuid;not null"`
 	PaymentMethod   *PaymentMethod `gorm:"foreignKey:PaymentMethodID"`
 	CompanyID       *uuid.UUID     `gorm:"type:uuid"`
