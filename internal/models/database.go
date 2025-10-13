@@ -32,15 +32,22 @@ func ConnectDataBase() {
 }
 
 func migrate() {
-	DB.AutoMigrate(
-		&User{},
+	logrus.Info("🚀 Starting database migration...")
+	err := DB.AutoMigrate(
 		&Company{},
+		&User{},
+		&PaymentMethod{},
+		&Category{},
 		&Transaction{},
 		&Installment{},
-		&Category{},
 		&Summary{},
-		&PaymentMethod{},
 	)
+
+	if err != nil {
+		logrus.Fatalf("Failed to migrate database: %v", err)
+	}
+
+	logrus.Info("✅ All tables migrated successfully!")
 }
 
 func GetUserId(c *gin.Context) (uuid.UUID, error) {
