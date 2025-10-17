@@ -1,0 +1,323 @@
+basePath: /api
+definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  domain.ErrorDetail:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+    type: object
+  domain.ErrorResponse:
+    properties:
+      details:
+        description: phrase
+        items:
+          $ref: '#/definitions/domain.ErrorDetail'
+        type: array
+      error:
+        description: code
+        type: string
+    type: object
+  models.UserType:
+    enum:
+    - 1
+    - 2
+    - 3
+    format: int32
+    type: integer
+    x-enum-comments:
+      UserTypeCompanyAdmin: Usuário admin de uma empresa
+      UserTypeCompanyMember: Usuário membro de uma empresa
+      UserTypePersonal: Usuário de conta pessoal
+    x-enum-descriptions:
+    - Usuário de conta pessoal
+    - Usuário admin de uma empresa
+    - Usuário membro de uma empresa
+    x-enum-varnames:
+    - UserTypePersonal
+    - UserTypeCompanyAdmin
+    - UserTypeCompanyMember
+  user.UserDto:
+    properties:
+      company_id:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      user_type:
+        $ref: '#/definitions/models.UserType'
+    type: object
+  user.UserRegister:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  user.UserUpdate:
+    properties:
+      companyId:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  user.UserUpdatePassword:
+    properties:
+      newPassword:
+        minLength: 6
+        type: string
+      newPasswordConfirm:
+        minLength: 6
+        type: string
+      oldPassword:
+        minLength: 6
+        type: string
+    required:
+    - newPassword
+    - newPasswordConfirm
+    - oldPassword
+    type: object
+host: localhost:7002
+info:
+  contact: {}
+  description: Esta é a documentação da API controlF.
+  title: controlF API
+  version: "1.0"
+paths:
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalida o token JWT do usuário, encerrando a sessão.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Faz logout do usuário
+      tags:
+      - Auth
+  /auth/token:
+    post:
+      consumes:
+      - application/json
+      description: Recebe credenciais de login (email e senha) e retorna um token
+        JWT para acesso autenticado.
+      parameters:
+      - description: Credenciais do usuário
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "400":
+          description: Dados inválidos
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Credenciais inválidas
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Autentica um usuário e retorna um token JWT
+      tags:
+      - Auth
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo usuário com os dados fornecidos.
+      parameters:
+      - description: Dados de registro do usuário
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.UserDto'
+        "400":
+          description: Dados inválidos
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Registra um novo usuário
+      tags:
+      - Users
+  /users/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um usuário a partir do ID
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UserDto'
+        "400":
+          description: ID de usuário inválido
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Usuário não encontrado
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Retorna um usuário
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um usuário específico.
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Dados de atualização do usuário
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/user.UserDto'
+        "400":
+          description: Dados inválidos ou ID de usuário inválido
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Usuário não encontrado
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualiza um usuário existente
+      tags:
+      - Users
+  /users/{userId}/password:
+    put:
+      consumes:
+      - application/json
+      description: Atualiza a senha de um usuário específico, exigindo a senha antiga
+        e a nova senha.
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Dados de atualização de senha
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserUpdatePassword'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/user.UserDto'
+        "400":
+          description: Dados inválidos, ID de usuário inválido ou senha antiga incorreta
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Usuário não encontrado
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualiza a senha de um usuário
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
