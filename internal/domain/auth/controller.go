@@ -33,23 +33,3 @@ func (controller *AuthController) logout(c *gin.Context) {
 	view := controller.AuthService.logout()
 	c.JSON(http.StatusOK, view)
 }
-
-func (controller *AuthController) register(c *gin.Context) {
-	var input RegisterRequest
-	if err := c.ShouldBindJSON(&input); err != nil {
-		out := utils.GetValidationErrors(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
-			Error:   "Form Validation",
-			Details: out,
-		})
-		return
-	}
-
-	err := controller.AuthService.register(input)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
-}

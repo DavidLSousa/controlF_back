@@ -2,7 +2,6 @@ package auth
 
 type AuthRepositoryInterface interface {
 	login(input LoginRequest) (*LoginResponse, error)
-	register(input RegisterRequest) error
 }
 
 func NewAuthRepository() AuthRepositoryInterface {

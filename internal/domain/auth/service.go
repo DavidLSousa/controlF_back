@@ -21,11 +21,3 @@ func (s *AuthService) login(input LoginRequest) *LoginResponse {
 func (s *AuthService) logout() *LoginResponse {
 	return nil
 }
-
-func (s *AuthService) register(input RegisterRequest) error {
-	err := s.AuthRepository.register(input)
-	if err != nil {
-		return err
-	}
-	return nil
-}

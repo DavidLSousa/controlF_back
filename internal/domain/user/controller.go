@@ -19,7 +19,7 @@ func NewUserController(service UserService) *UserController {
 	}
 }
 
-func (controller *UserController) post(c *gin.Context) {
+func (controller *UserController) register(c *gin.Context) {
 	var input UserRegister
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)

@@ -22,23 +22,3 @@ func (r *GormAuthRepository) login(input LoginRequest) (*LoginResponse, error) {
 
 	return &LoginResponse{Token: token}, nil
 }
-
-func (r *GormAuthRepository) register(input RegisterRequest) error {
-	hashedPassword, err := models.HashPassword(input.Password)
-	if err != nil {
-		return err
-	}
-
-	user := &models.User{
-		Name:     input.Name,
-		Email:    input.Email,
-		Password: hashedPassword,
-		Type:     models.UserTypePersonal, // Default to personal user type
-	}
-
-	if err := user.Save(); err != nil {
-		return err
-	}
-
-	return nil
-}
