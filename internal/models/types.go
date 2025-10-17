@@ -14,3 +14,10 @@ const (
 	TransactionTypeIncome  TransactionType = "INCOME"  // Entrada
 	TransactionTypeExpense TransactionType = "EXPENSE" // Saída
 )
+
+type Status string
+
+const (
+	StatusActive   Status = "ACTIVE"
+	StatusInactive Status = "INACTIVE"
+)

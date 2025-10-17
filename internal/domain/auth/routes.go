@@ -1,16 +1,14 @@
 package auth
 
 import (
-	"controlF_back/internal/middlewares"
-
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(r *gin.Engine, controller AuthController) {
 	unprotected := r.Group("/api")
-	unprotected.POST("/auth/token", controller.login)
+	unprotected.POST("/auth/token", controller.Login)
 
 	protected := r.Group("/api")
-	protected.Use(middlewares.JwtAuthMiddleware())
-	protected.POST("/auth/logout", controller.logout)
+	// protected.Use(middlewares.JwtAuthMiddleware())
+	protected.POST("/auth/logout", controller.Logout)
 }

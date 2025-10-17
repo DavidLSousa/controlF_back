@@ -1,5 +1,17 @@
 package auth
 
-type IAuthService interface {
-	login(input LoginRequest) *LoginResponse
+type AuthRepositoryInterface interface {
+	login(input LoginRequest) (*LoginResponse, error)
+}
+
+func NewAuthRepository() AuthRepositoryInterface {
+	return &GormAuthRepository{}
+}
+
+func InitAuthService() *AuthController {
+	repo := NewAuthRepository()
+	service := NewAuthService(repo)
+	controller := NewAuthController(*service)
+
+	return controller
 }

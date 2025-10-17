@@ -10,11 +10,15 @@ import (
 	"os"
 	"strings"
 
+	_ "controlF_back/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func init() {
@@ -28,6 +32,14 @@ func init() {
 	models.ConnectDataBase()
 }
 
+// @title           controlF API
+// @version         1.0
+// @description     Esta é a documentação da API controlF.
+// @host      localhost:7002
+// @BasePath  /api
+// @securityDefinitions.apikey BearerAuth
+// @in                       header
+// @name                     Authorization
 func main() {
 	// messagebroker.Start()
 
@@ -62,6 +74,8 @@ func main() {
 		})
 	})
 
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	setupRoutes(r)
 
 	host := utils.GetEnv("HOST", "")
@@ -70,24 +84,9 @@ func main() {
 }
 
 func setupRoutes(r *gin.Engine) {
-	authController := initAuthService()
-	userController := initUserService()
-
+	authController := auth.InitAuthService()
 	auth.RegisterRoutes(r, *authController)
+
+	userController := user.InitUserService()
 	user.RegisterRoutes(r, *userController)
-}
-
-func initAuthService() *auth.AuthController {
-	// repo
-	service := auth.NewAuthService()
-	controller := auth.NewAuthController(*service)
-
-	return controller
-}
-
-func initUserService() *user.UserController {
-	service := user.NewUserService()
-	controller := user.NewUserController(*service)
-
-	return controller
 }

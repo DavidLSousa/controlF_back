@@ -1,7 +1,6 @@
 package user
 
 import (
-	"controlF_back/internal/domain"
 	"controlF_back/internal/models"
 	"fmt"
 
@@ -10,27 +9,17 @@ import (
 )
 
 type UserService struct {
+	UserRepository UserRepositoryInterface
 }
 
-func NewUserService() *UserService {
-	return &UserService{}
-}
-
-func (s *UserService) List(userId uuid.UUID, pagination *models.Pagination) (*domain.ListView[UserDto], error) {
-	users, err := models.ListUser(userId, pagination)
-	if err != nil {
-		return nil, err
+func NewUserService(repo UserRepositoryInterface) *UserService {
+	return &UserService{
+		UserRepository: repo,
 	}
-
-	listView := domain.ListView[UserDto]{Page: pagination.Page}
-	for _, user := range users {
-		listView.List = append(listView.List, NewUserDto(&user))
-	}
-
-	return &listView, nil
 }
 
 func (s *UserService) Create(input UserRegister) (*UserDto, error) {
+	// Nao deve usar o bcrypt diretaemnte
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao gerar hash da nova senha: %w", err)
@@ -40,9 +29,10 @@ func (s *UserService) Create(input UserRegister) (*UserDto, error) {
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: string(hashedPassword),
+		Type:     models.UserTypePersonal,
 	}
 
-	if err := user.Save(); err != nil {
+	if err := s.UserRepository.Create(user); err != nil {
 		return nil, err
 	}
 
