@@ -70,24 +70,9 @@ func main() {
 }
 
 func setupRoutes(r *gin.Engine) {
-	authController := initAuthService()
-	userController := initUserService()
-
+	authController := auth.InitAuthService()
 	auth.RegisterRoutes(r, *authController)
+
+	userController := user.InitUserService()
 	user.RegisterRoutes(r, *userController)
-}
-
-func initAuthService() *auth.AuthController {
-	// repo
-	service := auth.NewAuthService()
-	controller := auth.NewAuthController(*service)
-
-	return controller
-}
-
-func initUserService() *user.UserController {
-	service := user.NewUserService()
-	controller := user.NewUserController(*service)
-
-	return controller
 }

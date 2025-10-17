@@ -1,19 +1,31 @@
 package auth
 
 type AuthService struct {
+	AuthRepository AuthRepositoryInterface
 }
 
-func NewAuthService() *AuthService {
-	return &AuthService{}
+func NewAuthService(repo AuthRepositoryInterface) *AuthService {
+	return &AuthService{
+		AuthRepository: repo,
+	}
 }
-
-// Garante que AuthService implementa IAuthService
-var _ IAuthService = (*AuthService)(nil)
 
 func (s *AuthService) login(input LoginRequest) *LoginResponse {
-	return nil
+	response, err := s.AuthRepository.login(input)
+	if err != nil {
+		return nil
+	}
+	return response
 }
 
 func (s *AuthService) logout() *LoginResponse {
+	return nil
+}
+
+func (s *AuthService) register(input RegisterRequest) error {
+	err := s.AuthRepository.register(input)
+	if err != nil {
+		return err
+	}
 	return nil
 }
