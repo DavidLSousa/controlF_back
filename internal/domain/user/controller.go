@@ -40,13 +40,13 @@ func (controller *UserController) Register(c *gin.Context) {
 		return
 	}
 
-	view, err := controller.UserService.Create(input)
+	data, err := controller.UserService.Create(input)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
-	c.JSON(http.StatusCreated, view)
+	c.JSON(http.StatusCreated, data)
 }
 
 // @Summary      Retorna um usuário
@@ -62,19 +62,19 @@ func (controller *UserController) Register(c *gin.Context) {
 // @Security     BearerAuth
 // @Router       /users/{userId} [get]
 func (controller *UserController) Get(c *gin.Context) {
-	// userId, err := uuid.Parse(c.Param("userId"))
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
-	// 	return
-	// }
+	userId, err := uuid.Parse(c.Param("userId"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		return
+	}
 
-	// view, err := controller.UserService.Get(userId)
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
-	// 	return
-	// }
+	data, err := controller.UserService.Get(userId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		return
+	}
 
-	c.JSON(http.StatusOK, "teste")
+	c.JSON(http.StatusOK, data)
 }
 
 // @Summary      Atualiza um usuário existente
@@ -107,13 +107,13 @@ func (controller *UserController) Put(c *gin.Context) {
 		return
 	}
 
-	view, err := controller.UserService.Update(userId, input)
+	data, err := controller.UserService.Update(userId, input)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
-	c.JSON(http.StatusAccepted, view)
+	c.JSON(http.StatusAccepted, data)
 }
 
 // @Summary      Atualiza a senha de um usuário
@@ -146,11 +146,11 @@ func (controller *UserController) PutPassword(c *gin.Context) {
 		return
 	}
 
-	view, err := controller.UserService.UpdatePassword(userId, input)
+	data, err := controller.UserService.UpdatePassword(userId, input)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
-	c.JSON(http.StatusAccepted, view)
+	c.JSON(http.StatusAccepted, data)
 }
