@@ -2,6 +2,7 @@ package user
 
 import (
 	"controlF_back/internal/models"
+	"controlF_back/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -18,8 +19,9 @@ func NewUserRepository() UserRepositoryInterface {
 }
 
 func InitUserService() *UserController {
+	crypt := utils.NewBcrypt()
 	repo := NewUserRepository()
-	service := NewUserService(repo)
+	service := NewUserService(repo, crypt)
 	controller := NewUserController(*service)
 
 	return controller
