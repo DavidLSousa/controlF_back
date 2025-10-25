@@ -2,6 +2,7 @@ package user
 
 import (
 	"controlF_back/internal/models"
+	"controlF_back/internal/utils"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -10,25 +11,26 @@ import (
 
 type UserService struct {
 	UserRepository UserRepositoryInterface
+	crypt          utils.Crypt
 }
 
-func NewUserService(repo UserRepositoryInterface) *UserService {
+func NewUserService(repo UserRepositoryInterface, crypt utils.Crypt) *UserService {
 	return &UserService{
 		UserRepository: repo,
+		crypt:          crypt,
 	}
 }
 
 func (s *UserService) Create(input UserRegister) (*UserDto, error) {
-	// Nao deve usar o bcrypt diretaemnte
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	hashedPassword, err := s.crypt.Hash(input.Password)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao gerar hash da nova senha: %w", err)
+		return nil, fmt.Errorf("error generating password: %w", err)
 	}
 
 	user := &models.User{
 		Name:     input.Name,
 		Email:    input.Email,
-		Password: string(hashedPassword),
+		Password: hashedPassword,
 		Type:     models.UserTypePersonal,
 	}
 
