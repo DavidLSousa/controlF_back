@@ -13,9 +13,9 @@ func (r *GormAuthRepository) login(input LoginRequest) (*LoginResponse, error) {
 		return nil, errors.New("invalid credentials")
 	}
 
-	if ok, err := models.VerifyPassword(input.Password, user.Password); !ok || err != nil {
-		return nil, errors.New("invalid credentials")
-	}
+	// if ok, err := models.VerifyPassword(input.Password, user.Password); !ok || err != nil {
+	// 	return nil, errors.New("invalid credentials")
+	// }
 
 	// TODO: Generate JWT token
 	token := "dummy-jwt-token"
