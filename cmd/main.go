@@ -42,6 +42,7 @@ func init() {
 // @name                     Authorization
 func main() {
 	// messagebroker.Start()
+	utils.SetupValidator()
 
 	r := gin.New()
 	r.Use(

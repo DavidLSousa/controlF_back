@@ -1,9 +1,13 @@
 package models
 
 import (
+	"controlF_back/internal/shared"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -18,8 +22,7 @@ type User struct {
 	Password string   `gorm:"type:varchar(255);not null"`
 	Type     UserType `gorm:"not null"`
 
-	/* Relacionamento com Empresa (opcional, apenas para usuários de empresa) */
-	CompanyID      *uuid.UUID      // Usamos ponteiro para permitir valor nulo (NULL)
+	CompanyID      *uuid.UUID      // Ponteiro para permitir valor nulo (NULL)
 	Company        *Company        `gorm:"foreignKey:CompanyID"`
 	Transactions   []Transaction   `gorm:"foreignKey:UserID"`
 	Categories     []Category      `gorm:"foreignKey:UserID"`
@@ -32,11 +35,17 @@ func (u *User) Save() error {
 		u.ID = uuid.New()
 	}
 
-	err := DB.Create(&u).Error
-	if err != nil {
-		return err
+	// TODO: Criar junto as categorias basicas - todas com status inactive (cafeteria, jantar, transporte, contas de casa, investimentos) na mesma tx
+
+	if err := DB.Create(&u).Error; err != nil {
+		var pgErr *pgconn.PgError
+
+		if errors.As(err, &pgErr) && pgErr.Code == shared.CodeErrorEmailAlreadyExists {
+			return errors.New(shared.ErrMessage("email", shared.IsExists))
+		}
+
+		return fmt.Errorf("error creating user: %w", err)
 	}
-	// Criar junto as categoras basicas - todas com status inactive (cafeteria, jantar, transporte, contas de casa, investimentos)
 
 	return nil
 }

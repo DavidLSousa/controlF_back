@@ -7,9 +7,10 @@ import (
 )
 
 type UserRegister struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
+	Name            string `json:"name" binding:"required,min=5,max=100"`
+	Email           string `json:"email" binding:"required,email"`
+	Password        string `json:"password" binding:"required,password"`
+	PasswordConfirm string `json:"passwordConfirm" binding:"required,password,eqfield=Password"`
 }
 
 type UserUpdate struct {
@@ -20,9 +21,9 @@ type UserUpdate struct {
 }
 
 type UserUpdatePassword struct {
-	NewPassword        string `json:"newPassword" binding:"required,min=6"`
-	NewPasswordConfirm string `json:"newPasswordConfirm" binding:"required,min=6"`
-	OldPassword        string `json:"oldPassword" binding:"required,min=6"`
+	NewPassword        string `json:"newPassword" binding:"required,password"`
+	NewPasswordConfirm string `json:"newPasswordConfirm" binding:"required,password,eqfield=NewPassword"`
+	OldPassword        string `json:"oldPassword" binding:"required,password"`
 }
 
 type UserDto struct {
