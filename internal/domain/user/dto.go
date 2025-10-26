@@ -15,7 +15,6 @@ type UserRegister struct {
 
 type UserUpdate struct {
 	Name      *string    `json:"name,omitempty"`
-	Email     *string    `json:"email,omitempty"`
 	Type      *string    `json:"type,omitempty"`
 	CompanyID *uuid.UUID `json:"companyId,omitempty"`
 }
@@ -27,11 +26,23 @@ type UserUpdatePassword struct {
 }
 
 type UserDto struct {
-	Id        string          `json:"id"`
+	Id        string          `json:"id,omitempty"`
 	Name      string          `json:"name"`
-	Email     string          `json:"email"`
+	Email     string          `json:"email,omitempty"`
 	Type      models.UserType `json:"user_type"`
 	CompanyId string          `json:"company_id,omitempty"`
+}
+
+func MapUserResposeDto(user *models.User) UserDto {
+	dto := UserDto{
+		Name:  user.Name,
+		Email: user.Email,
+		Type:  user.Type,
+	}
+	if user.CompanyID != nil {
+		dto.CompanyId = user.CompanyID.String()
+	}
+	return dto
 }
 
 func NewUserDto(user *models.User) UserDto {

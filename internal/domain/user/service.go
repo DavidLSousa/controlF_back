@@ -38,7 +38,7 @@ func (s *UserService) Create(input UserRegister) (*UserDto, error) {
 		return nil, err
 	}
 
-	dto := NewUserDto(user)
+	dto := MapUserResposeDto(user)
 	return &dto, nil
 }
 
@@ -48,7 +48,7 @@ func (s *UserService) Get(userId uuid.UUID) (*UserDto, error) {
 		return nil, err
 	}
 
-	dto := NewUserDto(user)
+	dto := MapUserResposeDto(user)
 	return &dto, nil
 }
 
@@ -62,9 +62,6 @@ func (s *UserService) Update(userId uuid.UUID, input UserUpdate) (*UserDto, erro
 	if input.Name != nil {
 		updates["name"] = input.Name
 	}
-	if input.Email != nil {
-		updates["email"] = input.Email
-	}
 	if input.Type != nil {
 		updates["type"] = input.Type
 	}
@@ -76,7 +73,7 @@ func (s *UserService) Update(userId uuid.UUID, input UserUpdate) (*UserDto, erro
 		return nil, err
 	}
 
-	dto := NewUserDto(user)
+	dto := MapUserResposeDto(user)
 	return &dto, nil
 }
 
@@ -108,6 +105,6 @@ func (s *UserService) UpdatePassword(userId uuid.UUID, input UserUpdatePassword)
 		return nil, fmt.Errorf("erro ao atualizar senha: %w", err)
 	}
 
-	dto := NewUserDto(user)
+	dto := MapUserResposeDto(user)
 	return &dto, nil
 }
