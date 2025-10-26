@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -43,7 +42,7 @@ func (s *UserService) Create(input UserRegister) (*UserDto, error) {
 }
 
 func (s *UserService) Get(userId uuid.UUID) (*UserDto, error) {
-	user, err := models.GetUser(userId)
+	user, err := s.UserRepository.Get(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +52,7 @@ func (s *UserService) Get(userId uuid.UUID) (*UserDto, error) {
 }
 
 func (s *UserService) Update(userId uuid.UUID, input UserUpdate) (*UserDto, error) {
-	user, err := models.GetUser(userId)
+	user, err := s.UserRepository.Get(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func (s *UserService) Update(userId uuid.UUID, input UserUpdate) (*UserDto, erro
 		updates["company_id"] = input.CompanyID
 	}
 
-	if err := user.Update(updates); err != nil {
+	if err := s.UserRepository.Update(user, updates); err != nil {
 		return nil, err
 	}
 
@@ -77,34 +76,30 @@ func (s *UserService) Update(userId uuid.UUID, input UserUpdate) (*UserDto, erro
 	return &dto, nil
 }
 
-func (s *UserService) UpdatePassword(userId uuid.UUID, input UserUpdatePassword) (*UserDto, error) {
-	user, err := models.GetUser(userId)
+func (s *UserService) UpdatePassword(userId uuid.UUID, input UserUpdatePassword) error {
+	user, err := s.UserRepository.Get(userId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	// Verifica se as novas senhas conferem
-	if input.NewPassword != input.NewPasswordConfirm {
-		return nil, fmt.Errorf("senhas não correspondem")
+	if err := s.crypt.Check(input.OldPassword, user.Password); err != nil {
+		return fmt.Errorf("old password incorrect")
 	}
 
-	// Verifica se a senha antiga confere com a que está no banco
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.OldPassword)); err != nil {
-		return nil, fmt.Errorf("senha antiga incorreta")
+	if input.OldPassword == input.NewPassword {
+		return fmt.Errorf("old password and new password cannot be the same")
 	}
 
-	// Gera o hash da nova senha
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.DefaultCost)
+	hashedPassword, err := s.crypt.Hash(input.NewPassword)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao gerar hash da nova senha: %w", err)
+		return fmt.Errorf("error generating new password hash: %w", err)
 	}
 
-	// Atualiza a senha do usuário
-	user.Password = string(hashedPassword)
-	if err := user.Save(); err != nil { // assumindo que Save persiste no banco
-		return nil, fmt.Errorf("erro ao atualizar senha: %w", err)
+	user.Password = hashedPassword
+
+	if err := s.UserRepository.UpdatePassword(user); err != nil {
+		return err
 	}
 
-	dto := MapUserResposeDto(user)
-	return &dto, nil
+	return nil
 }

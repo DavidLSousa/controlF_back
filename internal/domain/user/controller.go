@@ -146,11 +146,10 @@ func (controller *UserController) PutPassword(c *gin.Context) {
 		return
 	}
 
-	data, err := controller.UserService.UpdatePassword(userId, input)
-	if err != nil {
+	if err = controller.UserService.UpdatePassword(userId, input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
-	c.JSON(http.StatusAccepted, data)
+	c.JSON(http.StatusAccepted, gin.H{"message": "Password updated successfully"})
 }

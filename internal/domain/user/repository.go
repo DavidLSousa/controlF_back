@@ -13,7 +13,8 @@ func (r *GormUserRepository) Create(user *models.User) error {
 }
 
 func (r *GormUserRepository) Get(userId uuid.UUID) (*models.User, error) {
-	return models.GetUser(userId)
+	var user models.User
+	return user.GetUser(userId)
 }
 
 func (r *GormUserRepository) Update(user *models.User, updates map[string]interface{}) error {
@@ -21,5 +22,5 @@ func (r *GormUserRepository) Update(user *models.User, updates map[string]interf
 }
 
 func (r *GormUserRepository) UpdatePassword(user *models.User) error {
-	return user.Save()
+	return user.UpdatePassword(user)
 }

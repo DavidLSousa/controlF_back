@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -57,27 +56,29 @@ func (u *User) Update(updates map[string]interface{}) error {
 	return DB.Model(u).Updates(updates).Error
 }
 
-func GetUserWithRoles(id uuid.UUID) (*User, error) {
-	if id == uuid.Nil {
-		return nil, gorm.ErrInvalidData
-	}
-
-	u := &User{}
-	err := DB.Preload("RoleType").First(u, "id = ?", id).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return u, nil
+func (u *User) UpdatePassword(user *User) error {
+	return DB.Model(user).Update("password", user.Password).Error
 }
 
-func GetUser(id uuid.UUID) (*User, error) {
+// func (u *User) GetUserWithRoles(id uuid.UUID) (*User, error) {
+// 	if id == uuid.Nil {
+// 		return nil, gorm.ErrInvalidData
+// 	}
+
+// 	err := DB.Preload("RoleType").First(u, "id = ?", id).Error
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return u, nil
+// }
+
+func (u *User) GetUser(id uuid.UUID) (*User, error) {
 	if id == uuid.Nil {
 		return nil, gorm.ErrInvalidData
 	}
 
-	u := &User{}
 	err := DB.First(u, "id = ?", id).Error
 
 	if err != nil {
@@ -107,19 +108,3 @@ func GetUser(id uuid.UUID) (*User, error) {
 
 // 	return users, nil
 // }
-
-func VerifyPassword(password, hashedPassword string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if err != nil {
-		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
-}
-
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(bytes), err
-}
