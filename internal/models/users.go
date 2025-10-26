@@ -81,7 +81,10 @@ func GetUser(id uuid.UUID) (*User, error) {
 	err := DB.First(u, "id = ?", id).Error
 
 	if err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(shared.ErrMessage("user", shared.NotFound))
+		}
+		return nil, fmt.Errorf("error getting user: %w", err)
 	}
 
 	return u, nil
