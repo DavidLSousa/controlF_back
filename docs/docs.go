@@ -37,6 +37,12 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     },
+                    "400": {
+                        "description": "Dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Erro interno do servidor",
                         "schema": {
@@ -427,18 +433,23 @@ const docTemplate = `{
             "required": [
                 "email",
                 "name",
-                "password"
+                "password",
+                "passwordConfirm"
             ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 5
                 },
                 "password": {
-                    "type": "string",
-                    "minLength": 8
+                    "type": "string"
+                },
+                "passwordConfirm": {
+                    "type": "string"
                 }
             }
         },
@@ -446,9 +457,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "companyId": {
-                    "type": "string"
-                },
-                "email": {
                     "type": "string"
                 },
                 "name": {
@@ -468,16 +476,13 @@ const docTemplate = `{
             ],
             "properties": {
                 "newPassword": {
-                    "type": "string",
-                    "minLength": 6
+                    "type": "string"
                 },
                 "newPasswordConfirm": {
-                    "type": "string",
-                    "minLength": 6
+                    "type": "string"
                 },
                 "oldPassword": {
-                    "type": "string",
-                    "minLength": 6
+                    "type": "string"
                 }
             }
         }

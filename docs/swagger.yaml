@@ -71,20 +71,22 @@ definitions:
       email:
         type: string
       name:
+        maxLength: 100
+        minLength: 5
         type: string
       password:
-        minLength: 8
+        type: string
+      passwordConfirm:
         type: string
     required:
     - email
     - name
     - password
+    - passwordConfirm
     type: object
   user.UserUpdate:
     properties:
       companyId:
-        type: string
-      email:
         type: string
       name:
         type: string
@@ -94,13 +96,10 @@ definitions:
   user.UserUpdatePassword:
     properties:
       newPassword:
-        minLength: 6
         type: string
       newPasswordConfirm:
-        minLength: 6
         type: string
       oldPassword:
-        minLength: 6
         type: string
     required:
     - newPassword
@@ -124,6 +123,10 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Dados inválidos
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
         "500":
           description: Erro interno do servidor
           schema:
