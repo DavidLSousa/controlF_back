@@ -1,5 +1,6 @@
 package models
 
+// users
 type UserType uint8
 
 const (
@@ -8,6 +9,7 @@ const (
 	UserTypeCompanyMember UserType = 3 // Usuário membro de uma empresa
 )
 
+// transactions
 type TransactionType string
 
 const (
@@ -15,9 +17,21 @@ const (
 	TransactionTypeExpense TransactionType = "EXPENSE" // Saída
 )
 
+// categories
 type Status string
 
 const (
 	StatusActive   Status = "ACTIVE"
 	StatusInactive Status = "INACTIVE"
+)
+
+// claims
+type Claims string
+
+const (
+	ClaimLimited       Claims = "LIMITED"
+	ClaimVerified      Claims = "VERIFIED" // email
+	ClaimComplete      Claims = "COMPLETE" // cpf, end, phone
+	ClaimAdministrator Claims = "ADMIN"
+	ClaimBetaTester    Claims = "BETATESTER"
 )
