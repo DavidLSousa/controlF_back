@@ -1,10 +1,7 @@
 package token
 
 import (
-	"context"
-	"controlF_back/internal/kv"
 	"controlF_back/internal/utils"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -41,10 +38,6 @@ func CreateAccessTokenTTL(meta TokenMeta) (accessToken string, err error) {
 		return "", err
 	}
 
-	err = SaveToken(meta)
-	if err != nil {
-		return "", err
-	}
 	return t, err
 }
 
@@ -80,10 +73,7 @@ func CreateRefreshToken(meta TokenMeta) (refreshToken string, err error) {
 	if err != nil {
 		return "", err
 	}
-	err = SaveToken(meta)
-	if err != nil {
-		return "", err
-	}
+
 	return t, err
 }
 
@@ -147,71 +137,4 @@ func ExtractClaims(token *jwt.Token) (*JwtCustomClaims, error) {
 		return nil, errors.New("invalid token")
 	}
 	return claims, nil
-}
-
-func SaveToken(meta TokenMeta) error {
-	key := meta.GetKey()
-	value, err := json.Marshal(meta)
-	if err != nil {
-		return err
-	}
-	return kv.Client.Set(context.Background(), key, value, meta.Ttl).Err()
-}
-
-func ListTokens(tokenType TokenType, userId string) ([]TokenMeta, error) {
-	key := fmt.Sprintf("%s%s:%s:*", keyPrefix, userId, tokenType)
-	keys, err := kv.Client.Keys(context.Background(), key).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	tokens := make([]TokenMeta, 0)
-	for _, key := range keys {
-		value, err := kv.Client.Get(context.Background(), key).Bytes()
-		var result TokenMeta
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(value, &result)
-		if err != nil {
-			log.Error().Err(err).Msg("Error parsing token")
-		}
-		tokens = append(tokens, result)
-	}
-
-	return tokens, nil
-}
-
-func GetToken(tokenType TokenType, userId string, jti string) (TokenMeta, error) {
-	key := fmt.Sprintf("%s%s:%s:%s", keyPrefix, userId, tokenType, jti)
-	value, err := kv.Client.Get(context.Background(), key).Bytes()
-	var result TokenMeta
-	if err != nil {
-		return result, err
-	}
-	err = json.Unmarshal(value, &result)
-	if err != nil {
-		log.Error().Err(err).Msg("Error parsing token")
-	}
-	return result, nil
-}
-
-func CleanAll(pattern string) error {
-	keys, err := kv.Client.Keys(context.Background(), pattern).Result()
-	if err != nil {
-		return err
-	}
-
-	for _, key := range keys {
-		err := Clean(key)
-		if err != nil {
-			log.Error().Err(err).Msg("Error cleaning token")
-		}
-	}
-
-	return kv.Client.Del(context.Background(), pattern).Err()
-}
-
-func Clean(key string) error {
-	return kv.Client.Del(context.Background(), key).Err()
 }
