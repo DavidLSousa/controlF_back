@@ -85,9 +85,6 @@ func main() {
 }
 
 func setupRoutes(r *gin.Engine) {
-	authController := auth.InitAuthService()
-	auth.RegisterRoutes(r, *authController)
-
-	userController := user.InitUserService()
-	user.RegisterRoutes(r, *userController)
+	auth.RegisterRoutes(r, *auth.InitAuthService())
+	user.RegisterRoutes(r, *user.InitUserService())
 }

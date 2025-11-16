@@ -9,12 +9,12 @@ import (
 )
 
 type AuthController struct {
-	AuthService AuthService
+	UseCase AuthUseCases
 }
 
-func NewAuthController(service AuthService) *AuthController {
+func NewAuthHandler(useCase AuthUseCases) *AuthController {
 	return &AuthController{
-		AuthService: service,
+		UseCase: useCase,
 	}
 }
 
@@ -23,21 +23,34 @@ func NewAuthController(service AuthService) *AuthController {
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
-// @Param        credentials body auth.LoginRequest true "Credenciais do usuário"
+// @Param        credentials body auth.LoginRequestDto true "Credenciais do usuário"
 // @Success      200  {object}  auth.LoginResponse
 // @Failure      400  {object}  domain.ErrorResponse "Dados inválidos"
 // @Failure      401  {object}  domain.ErrorResponse "Credenciais inválidas"
 // @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
 // @Router       /auth/token [post]
 func (controller *AuthController) Login(c *gin.Context) {
-	var input LoginRequest
+	var input LoginRequestDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
-	view := controller.AuthService.login(input)
-	c.JSON(http.StatusOK, view)
+	res, err := controller.UseCase.Login(input)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: utils.PrintError(err)})
+		return
+	}
+	// c.JSON(http.StatusOK, view)
+
+	//  retornar 200 com o token no header
+	if res == nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: "invalid credentials"})
+		return
+	}
+
+	c.Header("Authorization", "Bearer "+res.Token)
+	c.Status(http.StatusOK)
 }
 
 // @Summary      Faz logout do usuário
@@ -51,6 +64,6 @@ func (controller *AuthController) Login(c *gin.Context) {
 // @Security     BearerAuth
 // @Router       /auth/logout [post]
 func (controller *AuthController) Logout(c *gin.Context) {
-	view := controller.AuthService.logout()
+	view := controller.UseCase.Logout()
 	c.JSON(http.StatusOK, view)
 }
