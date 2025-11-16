@@ -41,9 +41,7 @@ func (controller *AuthController) Login(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
-	// c.JSON(http.StatusOK, view)
 
-	//  retornar 200 com o token no header
 	if res == nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: "invalid credentials"})
 		return
