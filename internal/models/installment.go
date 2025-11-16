@@ -13,8 +13,8 @@ type Installment struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	Current       int          `gorm:"default:0"`
-	Total         int          `gorm:"default:0"`
-	TransactionID uuid.UUID    `gorm:"type:uuid;not null;uniqueIndex"`
-	Transaction   *Transaction `gorm:"foreignKey:TransactionID"`
+	Current int `gorm:"default:0"`
+	Total   int `gorm:"default:0"`
+
+	TransactionID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex"`
 }

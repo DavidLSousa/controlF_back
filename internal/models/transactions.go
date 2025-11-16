@@ -21,14 +21,8 @@ type Transaction struct {
 	IsRecurring bool            `gorm:"default:false"` // Para contas recorrentes (Academia)
 	IsPaid      bool            `gorm:"default:false"` // Para marcar se já foi paga
 
-	// Relacionamentos
-	Installment     *Installment
-	CategoryID      uuid.UUID      `gorm:"type:uuid;not null"`
-	Category        *Category      `gorm:"foreignKey:CategoryID"`
-	UserID          uuid.UUID      `gorm:"type:uuid;not null;index"`
-	User            *User          `gorm:"foreignKey:UserID"`
-	PaymentMethodID uuid.UUID      `gorm:"type:uuid;not null"`
-	PaymentMethod   *PaymentMethod `gorm:"foreignKey:PaymentMethodID"`
-	CompanyID       *uuid.UUID     `gorm:"type:uuid"`
-	Company         *Company       `gorm:"foreignKey:CompanyID"`
+	CategoryID      uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UserID          uuid.UUID  `gorm:"type:uuid;not null;index"`
+	PaymentMethodID uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CompanyID       *uuid.UUID `gorm:"type:uuid;index"`
 }

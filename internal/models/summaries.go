@@ -17,5 +17,4 @@ type Summary struct {
 	Balance  float64 `gorm:"not null"`
 
 	UserID uuid.UUID `gorm:"type:uuid;not null;index"`
-	User   *User     `gorm:"foreignKey:UserID"`
 }

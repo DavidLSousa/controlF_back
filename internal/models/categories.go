@@ -16,10 +16,7 @@ type Category struct {
 	Color  string `gorm:"type:varchar(7)"`  // Ex: #FFFFFF
 	Status Status `gorm:"type:varchar(10);not null"`
 
-	UserID uuid.UUID `gorm:"type:uuid;not null;index"`
-	User   *User     `gorm:"foreignKey:UserID"`
-
-	Transactions    []Transaction  `gorm:"foreignKey:CategoryID"`
-	PaymentMethodID *uuid.UUID     // Pode ser nulo se a categoria não estiver vinculada a um método de pagamento específico
-	PaymentMethod   *PaymentMethod `gorm:"foreignKey:PaymentMethodID"`
+	UserID          uuid.UUID  `gorm:"type:uuid;not null;index"`
+	PaymentMethodID *uuid.UUID `gorm:"type:uuid;index"` // Pode ser nulo
+	// []Transcations
 }

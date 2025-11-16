@@ -14,7 +14,5 @@ type Company struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
 	Name string `gorm:"type:varchar(255);not null"`
-
-	// Relação com usuários
-	Users []User `gorm:"foreignKey:CompanyID"`
+	// []Users
 }

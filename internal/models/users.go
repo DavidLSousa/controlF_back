@@ -21,12 +21,11 @@ type User struct {
 	Password string   `gorm:"type:varchar(255);not null"`
 	Type     UserType `gorm:"not null"`
 
-	CompanyID      *uuid.UUID      // Ponteiro para permitir valor nulo (NULL)
-	Company        *Company        `gorm:"foreignKey:CompanyID"`
-	Transactions   []Transaction   `gorm:"foreignKey:UserID"`
-	Categories     []Category      `gorm:"foreignKey:UserID"`
-	Summaries      []Summary       `gorm:"foreignKey:UserID"`
-	PaymentMethods []PaymentMethod `gorm:"foreignKey:UserID"`
+	CompanyID *uuid.UUID `gorm:"type:uuid;index"` // Ponteiro para permitir valor nulo (NULL)
+	// []Transactions
+	// []Categories
+	// []Summaries
+	// []PaymentMethods
 }
 
 func (u *User) Save() error {

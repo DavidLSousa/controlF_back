@@ -13,8 +13,6 @@ type PaymentMethod struct {
 
 	Name   string    `gorm:"type:varchar(100);not null"`
 	UserID uuid.UUID `gorm:"type:uuid;not null;index"`
-	User   *User     `gorm:"foreignKey:UserID"`
-
-	Categories   []Category    `gorm:"foreignKey:PaymentMethodID"`
-	Transactions []Transaction `gorm:"foreignKey:PaymentMethodID"`
+	// []Categories
+	// []Transactions
 }
