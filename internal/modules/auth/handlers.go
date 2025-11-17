@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"controlF_back/internal/domain"
+	"controlF_back/internal/modules"
 	"controlF_back/internal/utils"
 	"net/http"
 
@@ -25,25 +25,25 @@ func NewAuthHandler(useCase AuthUseCases) *AuthController {
 // @Produce      json
 // @Param        credentials body auth.LoginRequestDto true "Credenciais do usuário"
 // @Success      200  {object}  auth.LoginResponse
-// @Failure      400  {object}  domain.ErrorResponse "Dados inválidos"
-// @Failure      401  {object}  domain.ErrorResponse "Credenciais inválidas"
-// @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
+// @Failure      400  {object}  modules.ErrorResponse "Dados inválidos"
+// @Failure      401  {object}  modules.ErrorResponse "Credenciais inválidas"
+// @Failure      500  {object}  modules.ErrorResponse "Erro interno do servidor"
 // @Router       /auth/token [post]
 func (controller *AuthController) Login(c *gin.Context) {
 	var input LoginRequestDto
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
 	res, err := controller.UseCase.Login(input)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
 	if res == nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: "invalid credentials"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, modules.ErrorResponse{Error: "invalid credentials"})
 		return
 	}
 
@@ -57,8 +57,8 @@ func (controller *AuthController) Login(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Success      200
-// @Failure      400  {object}  domain.ErrorResponse "Dados inválidos"
-// @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
+// @Failure      400  {object}  modules.ErrorResponse "Dados inválidos"
+// @Failure      500  {object}  modules.ErrorResponse "Erro interno do servidor"
 // @Security     BearerAuth
 // @Router       /auth/logout [post]
 func (controller *AuthController) Logout(c *gin.Context) {

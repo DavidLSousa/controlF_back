@@ -1,4 +1,4 @@
-package domain
+package modules
 
 type ErrorDetail struct {
 	Field   string `json:"field"`

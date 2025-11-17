@@ -2,7 +2,7 @@ package models
 
 import (
 	"controlF_back/internal/database"
-	userDomain "controlF_back/internal/domain/user"
+	userModule "controlF_back/internal/modules/user"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +25,7 @@ func migrate() {
 	logrus.Info("🚀 Starting database migration...")
 	err := DB.AutoMigrate(
 		&Company{},
-		&userDomain.User{},
+		&userModule.User{},
 		&PaymentMethod{},
 		&Category{},
 		&Transaction{},

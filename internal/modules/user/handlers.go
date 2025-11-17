@@ -1,7 +1,7 @@
 package user
 
 import (
-	"controlF_back/internal/domain"
+	"controlF_back/internal/modules"
 	"controlF_back/internal/utils"
 	"net/http"
 
@@ -26,14 +26,14 @@ func NewUserController(useCases UserUseCases) *UserController {
 // @Produce      json
 // @Param        user body user.UserRegisterDto true "Dados de registro do usuário"
 // @Success      201  {object}  user.UserDto
-// @Failure      400  {object}  domain.ErrorResponse "Dados inválidos"
-// @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
+// @Failure      400  {object}  modules.ErrorResponse "Dados inválidos"
+// @Failure      500  {object}  modules.ErrorResponse "Erro interno do servidor"
 // @Router       /users [post]
 func (controller *UserController) Register(c *gin.Context) {
 	var input UserRegisterDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{
 			Error:   "Form Validation",
 			Details: out,
 		})
@@ -42,7 +42,7 @@ func (controller *UserController) Register(c *gin.Context) {
 
 	data, err := controller.useCases.Create(input)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
@@ -56,21 +56,21 @@ func (controller *UserController) Register(c *gin.Context) {
 // @Produce      json
 // @Param        userId path string true "ID do usuário"
 // @Success      200  {object}  user.UserDto
-// @Failure      400  {object}  domain.ErrorResponse "ID de usuário inválido"
-// @Failure      404  {object}  domain.ErrorResponse "Usuário não encontrado"
-// @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
+// @Failure      400  {object}  modules.ErrorResponse "ID de usuário inválido"
+// @Failure      404  {object}  modules.ErrorResponse "Usuário não encontrado"
+// @Failure      500  {object}  modules.ErrorResponse "Erro interno do servidor"
 // @Security     BearerAuth
 // @Router       /users/{userId} [get]
 func (controller *UserController) Get(c *gin.Context) {
 	userId, err := uuid.Parse(c.Param("userId"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
 	data, err := controller.useCases.Get(userId)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
@@ -85,16 +85,16 @@ func (controller *UserController) Get(c *gin.Context) {
 // @Param        userId path string true "ID do usuário"
 // @Param        user body user.UserUpdate true "Dados de atualização do usuário"
 // @Success      202  {object}  user.UserDto
-// @Failure      400  {object}  domain.ErrorResponse "Dados inválidos ou ID de usuário inválido"
-// @Failure      404  {object}  domain.ErrorResponse "Usuário não encontrado"
-// @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
+// @Failure      400  {object}  modules.ErrorResponse "Dados inválidos ou ID de usuário inválido"
+// @Failure      404  {object}  modules.ErrorResponse "Usuário não encontrado"
+// @Failure      500  {object}  modules.ErrorResponse "Erro interno do servidor"
 // @Security     BearerAuth
 // @Router       /users/{userId} [put]
 func (controller *UserController) Put(c *gin.Context) {
 	var input UserUpdateDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{
 			Error:   "Form Validation",
 			Details: out,
 		})
@@ -103,13 +103,13 @@ func (controller *UserController) Put(c *gin.Context) {
 
 	userId, err := uuid.Parse(c.Param("userId"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
 	data, err := controller.useCases.Update(userId, input)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
@@ -124,16 +124,16 @@ func (controller *UserController) Put(c *gin.Context) {
 // @Param        userId path string true "ID do usuário"
 // @Param        password body user.UserUpdatePassword true "Dados de atualização de senha"
 // @Success      202  {object}  user.UserDto
-// @Failure      400  {object}  domain.ErrorResponse "Dados inválidos, ID de usuário inválido ou senha antiga incorreta"
-// @Failure      404  {object}  domain.ErrorResponse "Usuário não encontrado"
-// @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
+// @Failure      400  {object}  modules.ErrorResponse "Dados inválidos, ID de usuário inválido ou senha antiga incorreta"
+// @Failure      404  {object}  modules.ErrorResponse "Usuário não encontrado"
+// @Failure      500  {object}  modules.ErrorResponse "Erro interno do servidor"
 // @Security     BearerAuth
 // @Router       /users/{userId}/password [put]
 func (controller *UserController) PutPassword(c *gin.Context) {
 	var input UserUpdatePasswordDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{
 			Error:   "Form Validation",
 			Details: out,
 		})
@@ -142,12 +142,12 @@ func (controller *UserController) PutPassword(c *gin.Context) {
 
 	userId, err := uuid.Parse(c.Param("userId"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 
 	if err = controller.useCases.UpdatePassword(userId, input); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, modules.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}
 

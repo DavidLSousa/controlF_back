@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"controlF_back/internal/domain"
+	"controlF_back/internal/modules"
 	"controlF_back/internal/token"
 	"controlF_back/internal/utils"
 	"net/http"
@@ -19,19 +19,19 @@ func AuthMiddlewareWithRole(roles []token.RoleType) gin.HandlerFunc {
 		authToken := GetBearerToken(c)
 
 		if len(authToken) == 0 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: "Not authorized"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, modules.ErrorResponse{Error: "Not authorized"})
 			return
 		}
 
 		claims, err := token.IsAuthorized(authToken)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: utils.PrintError(err)})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, modules.ErrorResponse{Error: utils.PrintError(err)})
 			return
 		}
 
 		if len(roles) > 0 {
 			if !containsAny(roles, claims.Roles) {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, domain.ErrorResponse{Error: "Not in role"})
+				c.AbortWithStatusJSON(http.StatusUnauthorized, modules.ErrorResponse{Error: "Not in role"})
 				return
 			}
 		}

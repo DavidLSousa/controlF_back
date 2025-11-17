@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"controlF_back/internal/domain"
+	"controlF_back/internal/modules"
 	"errors"
 	"unicode"
 
@@ -27,13 +27,13 @@ func getErrorMsg(fe validator.FieldError) string {
 	return "Unknown error"
 }
 
-func GetValidationErrors(err error) []domain.ErrorDetail {
+func GetValidationErrors(err error) []modules.ErrorDetail {
 	var ve validator.ValidationErrors
-	var out []domain.ErrorDetail
+	var out []modules.ErrorDetail
 	if errors.As(err, &ve) {
-		out = make([]domain.ErrorDetail, len(ve))
+		out = make([]modules.ErrorDetail, len(ve))
 		for i, fe := range ve {
-			out[i] = domain.ErrorDetail{Field: fe.Field(), Message: getErrorMsg(fe)}
+			out[i] = modules.ErrorDetail{Field: fe.Field(), Message: getErrorMsg(fe)}
 		}
 	}
 

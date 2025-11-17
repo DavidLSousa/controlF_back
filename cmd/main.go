@@ -1,9 +1,9 @@
 package main
 
 import (
-	"controlF_back/internal/domain/auth"
-	"controlF_back/internal/domain/user"
 	"controlF_back/internal/models"
+	"controlF_back/internal/modules/auth"
+	"controlF_back/internal/modules/user"
 	"controlF_back/internal/utils"
 	"controlF_back/internal/version"
 	"net/http"
