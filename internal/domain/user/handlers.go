@@ -10,12 +10,12 @@ import (
 )
 
 type UserController struct {
-	UserService UserService
+	useCases UserUseCases
 }
 
-func NewUserController(service UserService) *UserController {
+func NewUserController(useCases UserUseCases) *UserController {
 	return &UserController{
-		UserService: service,
+		useCases: useCases,
 	}
 }
 
@@ -24,13 +24,13 @@ func NewUserController(service UserService) *UserController {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        user body user.UserRegister true "Dados de registro do usuário"
+// @Param        user body user.UserRegisterDto true "Dados de registro do usuário"
 // @Success      201  {object}  user.UserDto
 // @Failure      400  {object}  domain.ErrorResponse "Dados inválidos"
 // @Failure      500  {object}  domain.ErrorResponse "Erro interno do servidor"
 // @Router       /users [post]
 func (controller *UserController) Register(c *gin.Context) {
-	var input UserRegister
+	var input UserRegisterDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
@@ -40,7 +40,7 @@ func (controller *UserController) Register(c *gin.Context) {
 		return
 	}
 
-	data, err := controller.UserService.Create(input)
+	data, err := controller.useCases.Create(input)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
@@ -68,7 +68,7 @@ func (controller *UserController) Get(c *gin.Context) {
 		return
 	}
 
-	data, err := controller.UserService.Get(userId)
+	data, err := controller.useCases.Get(userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
@@ -91,7 +91,7 @@ func (controller *UserController) Get(c *gin.Context) {
 // @Security     BearerAuth
 // @Router       /users/{userId} [put]
 func (controller *UserController) Put(c *gin.Context) {
-	var input UserUpdate
+	var input UserUpdateDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
@@ -107,7 +107,7 @@ func (controller *UserController) Put(c *gin.Context) {
 		return
 	}
 
-	data, err := controller.UserService.Update(userId, input)
+	data, err := controller.useCases.Update(userId, input)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
@@ -130,7 +130,7 @@ func (controller *UserController) Put(c *gin.Context) {
 // @Security     BearerAuth
 // @Router       /users/{userId}/password [put]
 func (controller *UserController) PutPassword(c *gin.Context) {
-	var input UserUpdatePassword
+	var input UserUpdatePasswordDto
 	if err := c.ShouldBindJSON(&input); err != nil {
 		out := utils.GetValidationErrors(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{
@@ -146,7 +146,7 @@ func (controller *UserController) PutPassword(c *gin.Context) {
 		return
 	}
 
-	if err = controller.UserService.UpdatePassword(userId, input); err != nil {
+	if err = controller.useCases.UpdatePassword(userId, input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ErrorResponse{Error: utils.PrintError(err)})
 		return
 	}

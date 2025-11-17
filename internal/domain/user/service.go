@@ -1,105 +1,63 @@
 package user
 
 import (
-	"controlF_back/internal/models"
 	"controlF_back/internal/utils"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type UserService struct {
-	UserRepository UserRepositoryInterface
-	crypt          utils.Crypt
+	crypt utils.Crypt
 }
 
-func NewUserService(repo UserRepositoryInterface, crypt utils.Crypt) *UserService {
-	return &UserService{
-		UserRepository: repo,
-		crypt:          crypt,
-	}
+func NewUserService(crypt utils.Crypt) *UserService {
+	return &UserService{crypt: crypt}
 }
 
-func (s *UserService) Create(input UserRegister) (*UserDto, error) {
-	hashedPassword, err := s.crypt.Hash(input.Password)
+func (s *UserService) NewUser(name, email, password string) (*User, error) {
+	hashedPassword, err := s.HashPassword(password)
 	if err != nil {
-		return nil, fmt.Errorf("error generating password: %w", err)
+		return nil, err
 	}
 
-	user := &models.User{
-		Name:     input.Name,
-		Email:    input.Email,
+	user := &User{
+		Name:     name,
+		Email:    email,
 		Password: hashedPassword,
-		Type:     models.UserTypePersonal,
+		Type:     UserTypePersonal,
 	}
 
-	if err := s.UserRepository.Create(user); err != nil {
-		return nil, err
-	}
-
-	dto := MapUserResposeDto(user)
-	return &dto, nil
+	return user, nil
 }
 
-func (s *UserService) Get(userId uuid.UUID) (*UserDto, error) {
-	user, err := s.UserRepository.Get(userId)
+func (s *UserService) HashPassword(password string) (string, error) {
+	hashedPassword, err := s.crypt.Hash(password)
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("error generating password: %w", err)
 	}
 
-	dto := MapUserResposeDto(user)
-	return &dto, nil
+	return hashedPassword, nil
 }
 
-func (s *UserService) Update(userId uuid.UUID, input UserUpdate) (*UserDto, error) {
-	user, err := s.UserRepository.Get(userId)
-	if err != nil {
-		return nil, err
-	}
-
-	updates := make(map[string]interface{})
-	if input.Name != nil {
-		updates["name"] = input.Name
-	}
-	if input.Type != nil {
-		updates["type"] = input.Type
-	}
-	if input.CompanyID != nil {
-		updates["company_id"] = input.CompanyID
-	}
-
-	if err := s.UserRepository.Update(user, updates); err != nil {
-		return nil, err
-	}
-
-	dto := MapUserResposeDto(user)
-	return &dto, nil
+func (s *UserService) CheckPassword(oldPassword, hashedPassword string) error {
+	return s.crypt.Check(oldPassword, hashedPassword)
 }
 
-func (s *UserService) UpdatePassword(userId uuid.UUID, input UserUpdatePassword) error {
-	user, err := s.UserRepository.Get(userId)
-	if err != nil {
-		return err
-	}
-
-	if err := s.crypt.Check(input.OldPassword, user.Password); err != nil {
+func (s *UserService) ValidationUpdatePassword(user *User, oldPass, newPass, newPassConfirm string) error {
+	if err := s.CheckPassword(oldPass, user.Password); err != nil {
 		return fmt.Errorf("old password incorrect")
 	}
 
-	if input.OldPassword == input.NewPassword {
+	if oldPass == newPass {
 		return fmt.Errorf("old password and new password cannot be the same")
 	}
 
-	hashedPassword, err := s.crypt.Hash(input.NewPassword)
+	hashedNewPassword, err := s.HashPassword(newPass)
 	if err != nil {
-		return fmt.Errorf("error generating new password hash: %w", err)
-	}
-
-	user.Password = hashedPassword
-
-	if err := s.UserRepository.UpdatePassword(user); err != nil {
 		return err
 	}
 
+	user.Password = hashedNewPassword
 	return nil
 }
+
+// validaçZoes para update
