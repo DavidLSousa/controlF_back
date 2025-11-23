@@ -12,16 +12,6 @@ func NewAuthService() *AuthService {
 	return &AuthService{}
 }
 
-// Precisa ser ajustado:
-/*
-Lógica de domínio ✅
-	Definir roles do usuário
-	Criar metadata do token
-Mas depende de infraestrutura ❌
-	token.CreateAccessToken() - geração de JWT (infra)
-	uuid.New() - geração de UUID (infra)
-*/
-
 func (d *AuthService) generateAuthTokens(authUser AuthUser) (string, error) {
 	jti := uuid.New()
 	roles := []token.RoleType{token.RoleTypeUser}
@@ -38,14 +28,5 @@ func (d *AuthService) generateAuthTokens(authUser AuthUser) (string, error) {
 		return "", err
 	}
 
-	// refreshToken, err := token.CreateRefreshToken(meta)
-	// if err != nil {
-	// 	return "", "", err
-	// }
-
 	return accessToken, nil
 }
-
-// func (d *AuthService) setRefreshTokenCookie(c *gin.Context, refreshToken string) {
-// 	token.SetRefreshTokenCookie(c, refreshToken)
-// }
